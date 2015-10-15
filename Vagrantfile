@@ -43,9 +43,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true
 
   ## Ansible provisioner.
-  #config.vm.provision "ansible" do |ansible|
-    #ansible.playbook = "vagrant.yml"
-    #ansible.host_key_checking = false
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "vagrant.yml"
+    ansible.host_key_checking = false
     #ansible.verbose = "vvvv"
-  #end
+  end
 end
