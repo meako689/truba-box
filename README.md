@@ -18,7 +18,7 @@ provisions:
 
 ## Usage
 
-- clone or put biggggidea.com project into current dir
+- clone or put truba project source code into current dir
 - `vagrant up`
 - `vagrant ssh` to get inside VM
 - your project is in `/vagrant` dir inside VM which is automatically synced with this folder
