@@ -1,0 +1,109 @@
+---
+
+- name: Create a Biggggidea virtual machine via vagrant
+  hosts: all
+  sudo: yes
+  sudo_user: root
+  remote_user: vagrant
+  vars:
+      application_name: "truba"
+      db_name: "truba"
+      db_user: "truba"
+      db_password: "truba"
+      proj_root: "/vagrant/truba"
+      virtualenv_path: "{{proj_root}}/venv"
+
+  tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+
+    #base
+    - name: Ensure bash, OpenSSl, and libssl are the latest versions
+      apt: name={{ item }} state=latest
+      with_items:
+        - bash
+        - openssl
+        - libssl-dev
+        - libssl-doc
+
+    - name: Install base packages
+      apt: name={{ item }} force=yes state=present
+      with_items:
+        - build-essential
+        - ntp
+        - htop
+        - git
+        - libpq-dev
+        - python-dev
+        - python-pip
+        - python-pycurl
+        - python-augeas
+        - swig
+        - libxml2-dev
+        - libxslt1-dev
+        - libffi-dev
+        - supervisor
+        - nodejs
+        - npm
+        - ruby-dev
+        - rubygems-integration
+
+    - name: Install virtualenv
+      pip: name=virtualenv
+
+    # web
+    - name: install nginx
+      apt: name=nginx state=present
+
+    #- name: Create the Nginx configuration file
+      #template: src=files/nginx_site_config.j2
+                #dest=/etc/nginx/sites-enabled/{{ application_name }}
+                #backup=yes
+      #notify: reload nginx
+
+    - name: Ensure Nginx service is started
+      service: name=nginx state=started enabled=yes
+
+    #db
+    - name: install db
+      apt: name={{ item }} state=present
+      with_items:
+        - postgresql
+        - postgresql-contrib
+        - python-psycopg2
+    - name: Ensure the PostgreSQL service is running
+      service: name=postgresql state=started enabled=yes
+
+    - name: Ensure database is created
+      sudo_user: postgres
+      postgresql_db: name={{ db_name }}
+                     encoding='UTF-8'
+                     lc_collate='en_US.UTF-8'
+                     lc_ctype='en_US.UTF-8'
+                     template='template0'
+                     state=present
+
+    - name: Ensure user has access to the database
+      sudo_user: postgres
+      postgresql_user: db={{ db_name }}
+                       name={{ db_user }}
+                       password={{ db_password }}
+                       priv=ALL
+                       state=present
+
+    # CSS compiling tools.
+    #
+    - name:  Install SASS
+      action: command gem install sass creates=/usr/local/bin/sass
+
+    - name: CSS | Install Compass
+      action: command gem install compass creates=/usr/local/bin/compass
+          #
+    # create bashrc
+    - name: Create bashrc
+      file: src=files/bashrc
+                dest=/home/vagrant/.bashrc
+
+    - name: Create the virtualenv
+      command: virtualenv {{ virtualenv_path }} --no-site-packages
+               creates={{ virtualenv_path }}/bin/activate
