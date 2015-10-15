@@ -98,12 +98,17 @@
 
     - name: CSS | Install Compass
       action: command gem install compass creates=/usr/local/bin/compass
-          #
-    # create bashrc
+        
+          
     - name: Create bashrc
-      file: src=files/bashrc
+      copy: src=files/bashrc
                 dest=/home/vagrant/.bashrc
 
     - name: Create the virtualenv
       command: virtualenv {{ virtualenv_path }} --no-site-packages
                creates={{ virtualenv_path }}/bin/activate
+    
+    - name: Install requirements
+      pip:
+        requirements={{proj_root}}/requirements.pip
+        virtualenv={{virtualenv_path}}

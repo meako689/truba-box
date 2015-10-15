@@ -114,4 +114,4 @@ if ! shopt -oq posix; then
 fi
 
 cd /vagrant;
-. /vagrant/bigidea/var/virtualenv/bigidea/bin/activate;
+. /vagrant/truba/venv/bin/activate;
