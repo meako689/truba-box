@@ -110,5 +110,5 @@
     
     - name: Install requirements
       pip:
-        requirements={{proj_root}}/requirements.pip
+        requirements={{proj_root}}/requirements.txt
         virtualenv={{virtualenv_path}}
